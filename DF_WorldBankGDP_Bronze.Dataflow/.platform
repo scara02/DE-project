@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Dataflow",
+    "displayName": "DF_WorldBankGDP_Bronze"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "0345c9de-701e-8bb4-460d-2199e77c98f3"
+  }
+}
