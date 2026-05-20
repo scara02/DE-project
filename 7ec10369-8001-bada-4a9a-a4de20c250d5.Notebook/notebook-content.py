@@ -63,13 +63,13 @@ try:
 except:
     last_date = None
 
-if last_date:
+if last_date is None:
     date_from = date(2022, 1, 1)
 else:
     date_from = datetime.strptime(str(last_date)[:10], "%Y-%m-%d").date() + timedelta(days=1)
 
 date_to = date.today().replace(day=1) - timedelta(days=1)
-date_to = date(2024, 12, 31)
+
 if date_from > date_to:
     print("Already up to date.")
     date_from = None

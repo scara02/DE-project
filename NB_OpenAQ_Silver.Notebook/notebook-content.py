@@ -102,6 +102,7 @@ df_enriched = (df_clean
 # CELL ********************
 
 df_enriched.write.format("delta").mode("overwrite") \
+    .option("overwriteSchema", "true") \
     .partitionBy("year", "month").saveAsTable("silver_openaq_hourly")
 
 # METADATA ********************
