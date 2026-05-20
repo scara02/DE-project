@@ -1,0 +1,160 @@
+table FactAirQualityDaily
+	lineageTag: 1855a077-04a1-4564-a74d-2a81f0ce85ab
+	sourceLineageTag: [dbo].[FactAirQualityDaily]
+
+	measure 'Avg Pollutant Value' = AVERAGE(FactAirQualityDaily[avg_pollutant_value])
+		lineageTag: 31cbcafd-9c6f-4176-97b3-f82320ffbd87
+
+		changedProperty = Name
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Highest Avg Pollutant' =
+			
+			VAR SummaryTable =
+			    SUMMARIZE(
+			        FactAirQualityDaily,
+			        FactAirQualityDaily[pollutant],
+			        "AvgValue", [Avg Pollutant Value]
+			    )
+			VAR TopPollutant =
+			    TOPN(
+			        1,
+			        SummaryTable,
+			        [AvgValue],
+			        DESC
+			    )
+			RETURN
+			    CONCATENATEX(
+			        TopPollutant,
+			        FactAirQualityDaily[pollutant],
+			        ", "
+			    )
+		lineageTag: 6c09e3d1-c76a-4ec4-85dd-383f28a68943
+
+		changedProperty = Name
+
+	measure 'Peak Pollutant Value' =
+			
+			MAX(FactAirQualityDaily[max_pollutant_value])
+		lineageTag: 0efac3d6-c1eb-4d83-b5f1-b31a5510b9ae
+
+		changedProperty = Name
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Weighted Avg Pollutant Value' =
+			
+			DIVIDE(
+			    SUMX(
+			        FactAirQualityDaily,
+			        FactAirQualityDaily[avg_pollutant_value] * FactAirQualityDaily[measurement_count]
+			    ),
+			    SUM(FactAirQualityDaily[measurement_count])
+			)
+		lineageTag: 163f125f-fddd-4533-b040-1398ff9160c2
+
+		changedProperty = Name
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Weighted Avg PM2.5' =
+			
+			CALCULATE(
+			    [Weighted Avg Pollutant Value],
+			    FactAirQualityDaily[pollutant] = "pm25"
+			)
+		lineageTag: e848d97e-01c6-4e72-befa-b6bf6ca1d5c0
+
+		changedProperty = Name
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column date_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 54a2fe08-15cc-45d8-8051-1c498f30a09a
+		sourceLineageTag: date_key
+		summarizeBy: none
+		sourceColumn: date_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 69171e71-e7f2-47df-8943-a0a41096ae69
+		sourceLineageTag: date
+		summarizeBy: none
+		sourceColumn: date
+
+		annotation SummarizationSetBy = Automatic
+
+	column borough
+		dataType: string
+		lineageTag: 8f0fca93-8ad4-440e-8f3c-f649cfb862bf
+		sourceLineageTag: borough
+		summarizeBy: none
+		sourceColumn: borough
+
+		annotation SummarizationSetBy = Automatic
+
+	column pollutant
+		dataType: string
+		lineageTag: acc2ed62-2483-40c9-a4fe-5108453a89a2
+		sourceLineageTag: pollutant
+		summarizeBy: none
+		sourceColumn: pollutant
+
+		annotation SummarizationSetBy = Automatic
+
+	column avg_pollutant_value
+		dataType: double
+		lineageTag: cf179fb6-bcdd-4e14-8759-f3df89811339
+		sourceLineageTag: avg_pollutant_value
+		summarizeBy: sum
+		sourceColumn: avg_pollutant_value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column min_pollutant_value
+		dataType: double
+		lineageTag: 8226e3c4-f883-4e58-be94-a08b6f943c29
+		sourceLineageTag: min_pollutant_value
+		summarizeBy: sum
+		sourceColumn: min_pollutant_value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column max_pollutant_value
+		dataType: double
+		lineageTag: 68c1b43c-8d62-47e0-b1f1-23f2201905a3
+		sourceLineageTag: max_pollutant_value
+		summarizeBy: sum
+		sourceColumn: max_pollutant_value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column measurement_count
+		dataType: int64
+		formatString: 0
+		lineageTag: b953b859-d062-4cca-84d5-0038662655c1
+		sourceLineageTag: measurement_count
+		summarizeBy: sum
+		sourceColumn: measurement_count
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FactAirQualityDaily = entity
+		mode: directLake
+		source
+			entityName: FactAirQualityDaily
+			schemaName: dbo
+			expressionSource: 'DirectLake - GoldWH'
+

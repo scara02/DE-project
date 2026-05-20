@@ -1,0 +1,39 @@
+table DimZone
+	lineageTag: d3c756d5-58e1-432c-9109-0dd6fa8aeeca
+	sourceLineageTag: [dbo].[DimZone]
+
+	column zone_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 23aee621-cde5-4dd1-b68a-a33a05a29e1e
+		sourceLineageTag: zone_id
+		summarizeBy: none
+		sourceColumn: zone_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column borough
+		dataType: string
+		lineageTag: 41881aa6-de32-4fd8-bb82-6697c1d33479
+		sourceLineageTag: borough
+		summarizeBy: none
+		sourceColumn: borough
+
+		annotation SummarizationSetBy = Automatic
+
+	column zone_name
+		dataType: string
+		lineageTag: 50eff842-a96a-487f-8bd2-1b032c3fe657
+		sourceLineageTag: zone_name
+		summarizeBy: none
+		sourceColumn: zone_name
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimZone = entity
+		mode: directLake
+		source
+			entityName: DimZone
+			schemaName: dbo
+			expressionSource: 'DirectLake - GoldWH'
+

@@ -80,6 +80,7 @@ stg_fact_taxi_daily = (taxi_with_boroughs
         "date_key",
         "pickup_date",
         "borough",
+        "zone"
         "trip_count",
         "total_revenue_usd",
         "avg_revenue_per_trip_usd",
@@ -100,6 +101,81 @@ stg_fact_taxi_daily = (taxi_with_boroughs
 stg_fact_taxi_daily.write.format("delta") \
     .mode("overwrite").option("overwriteSchema", "true") \
     .saveAsTable("stg_fact_taxi_daily")
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+taxi_with_zones = (taxi
+    .join(
+        zones.select(
+            F.col("zone_id").alias("PULocationID"),
+            F.col("zone_id"),
+            F.col("borough"),
+            F.col("zone_name")
+        ),
+        "PULocationID",
+        "inner"
+    )
+)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+stg_fact_taxi_zone_daily = (taxi_with_zones
+    .groupBy(
+        "pickup_date",
+        "zone_id",
+        "borough",
+        "zone_name"
+    )
+    .agg(
+        F.count("*").alias("trip_count"),
+        F.round(F.sum("total_amount"), 2).alias("total_revenue_usd"),
+        F.round(F.avg("total_amount"), 2).alias("avg_revenue_per_trip_usd"),
+        F.round(F.avg("fare_amount"), 2).alias("avg_fare_usd"),
+        F.round(F.avg("trip_distance"), 2).alias("avg_trip_distance"),
+        F.round(F.avg("trip_duration_min"), 2).alias("avg_trip_duration_min")
+    )
+    .withColumn("date_key", F.date_format("pickup_date", "yyyyMMdd").cast("int"))
+    .select(
+        "date_key",
+        "pickup_date",
+        "zone_id",
+        "borough",
+        "zone_name",
+        "trip_count",
+        "total_revenue_usd",
+        "avg_revenue_per_trip_usd",
+        "avg_fare_usd",
+        "avg_trip_distance",
+        "avg_trip_duration_min"
+    )
+)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+stg_fact_taxi_zone_daily.write.format("delta") \
+    .mode("overwrite").option("overwriteSchema", "true") \
+    .saveAsTable("stg_fact_taxi_zone_daily")
 
 # METADATA ********************
 
@@ -138,6 +214,7 @@ stg_fact_air_quality_daily = (air
         "date_key",
         "date",
         "borough",
+        "location_id"
         "pollutant",
         "avg_pollutant_value",
         "min_pollutant_value",

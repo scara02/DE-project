@@ -71,6 +71,8 @@ else:
     first_write = False
 
 date_to = date.today().replace(day=1) - timedelta(days=1)
+date_from = date(2022, 1, 1)
+date_to = date(2026,3,31)
 
 if date_from > date_to:
     print("Already up to date.")

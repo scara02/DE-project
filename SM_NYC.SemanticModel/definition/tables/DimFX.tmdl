@@ -1,0 +1,42 @@
+table DimFX
+	lineageTag: 29d46047-e7b5-47b1-b9b0-8e0ace669b8a
+	sourceLineageTag: [dbo].[DimFX]
+
+	column date_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 1b0223d8-1d76-4cef-aa3d-a74244107a62
+		sourceLineageTag: date_key
+		summarizeBy: sum
+		sourceColumn: date_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column full_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 76b7ed24-ca72-4c48-bf57-9095cb87220d
+		sourceLineageTag: full_date
+		summarizeBy: none
+		sourceColumn: full_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column usd_eur
+		dataType: double
+		lineageTag: fdbcf6fd-f16f-449c-890e-1da97ef5f71a
+		sourceLineageTag: usd_eur
+		summarizeBy: sum
+		sourceColumn: usd_eur
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition DimFX = entity
+		mode: directLake
+		source
+			entityName: DimFX
+			schemaName: dbo
+			expressionSource: 'DirectLake - GoldWH'
+

@@ -129,3 +129,19 @@ df_locations.write.format("delta").mode("overwrite") \
 # META   "language": "python",
 # META   "language_group": "synapse_pyspark"
 # META }
+
+# CELL ********************
+
+display(
+    spark.read.table("silver_openaq_hourly")
+    .select("pollutant")
+    .distinct()
+    .orderBy("pollutant")
+)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }

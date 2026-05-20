@@ -1,0 +1,20 @@
+table DimBorough
+	lineageTag: b1852ecc-a751-4795-a402-0365899bddf2
+	sourceLineageTag: [dbo].[DimBorough]
+
+	column borough
+		dataType: string
+		lineageTag: deddbdc0-2e9f-42d1-9ea3-623c5282178b
+		sourceLineageTag: borough
+		summarizeBy: none
+		sourceColumn: borough
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimBorough = entity
+		mode: directLake
+		source
+			entityName: DimBorough
+			schemaName: dbo
+			expressionSource: 'DirectLake - GoldWH'
+

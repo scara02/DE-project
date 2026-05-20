@@ -1,0 +1,32 @@
+table DimGDP
+	lineageTag: 154cf757-4ee5-4aa6-b3a4-a77b467f65db
+	sourceLineageTag: [dbo].[DimGDP]
+
+	column year
+		dataType: int64
+		formatString: 0
+		lineageTag: ea5cc971-818a-42fb-a6fc-2cbd6f84a7f3
+		sourceLineageTag: year
+		summarizeBy: sum
+		sourceColumn: year
+
+		annotation SummarizationSetBy = Automatic
+
+	column gdp_usd
+		dataType: double
+		lineageTag: d8f33950-9abe-489e-913f-6bd7ce8a6f8d
+		sourceLineageTag: gdp_usd
+		summarizeBy: sum
+		sourceColumn: gdp_usd
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition DimGDP = entity
+		mode: directLake
+		source
+			entityName: DimGDP
+			schemaName: dbo
+			expressionSource: 'DirectLake - GoldWH'
+

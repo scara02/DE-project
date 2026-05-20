@@ -1,0 +1,132 @@
+table FactTaxiDaily
+	lineageTag: 7ea7f551-3301-4ba1-acc7-76b2ebe94fb4
+	sourceLineageTag: [dbo].[FactTaxiDaily]
+
+	measure 'Total Trips' = SUM(FactTaxiDaily[trip_count])
+		formatString: 0
+		lineageTag: 4e04a7f8-8a58-49a8-913a-6b65a3383953
+
+		changedProperty = Name
+
+	measure 'Total Revenue USD' = SUM(FactTaxiDaily[total_revenue_usd])
+		lineageTag: 9c03e838-17c9-4d3e-b542-5eb8b2421e44
+
+		changedProperty = Name
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Avg Revenue per Trip USD' = DIVIDE(SUM(FactTaxiDaily[total_revenue_usd]), SUM(FactTaxiDaily[trip_count]))
+		lineageTag: 656d0993-c9fc-45d4-9d56-54680226c35f
+
+		changedProperty = Name
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Mean Fare USD' = AVERAGE(FactTaxiDaily[avg_fare_usd])
+		lineageTag: 007b2259-7053-4d11-867f-e41185a218a8
+
+		changedProperty = Name
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column date_key
+		dataType: int64
+		formatString: 0
+		lineageTag: e7871a6a-2c33-4b82-b38a-bb1e3f3b25b9
+		sourceLineageTag: date_key
+		summarizeBy: none
+		sourceColumn: date_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column pickup_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: f5bc5fc1-e062-4974-97e2-c91a9392b857
+		sourceLineageTag: pickup_date
+		summarizeBy: none
+		sourceColumn: pickup_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column borough
+		dataType: string
+		lineageTag: e33488b7-359d-403a-a71d-92ba6abb08e4
+		sourceLineageTag: borough
+		summarizeBy: none
+		sourceColumn: borough
+
+		annotation SummarizationSetBy = Automatic
+
+	column trip_count
+		dataType: int64
+		formatString: 0
+		lineageTag: ac144a15-618f-466e-97c1-dc52f08c3d7e
+		sourceLineageTag: trip_count
+		summarizeBy: sum
+		sourceColumn: trip_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_revenue_usd
+		dataType: double
+		lineageTag: 35e43df4-e6a5-4cbf-965a-7f700ddbcf81
+		sourceLineageTag: total_revenue_usd
+		summarizeBy: sum
+		sourceColumn: total_revenue_usd
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column avg_revenue_per_trip_usd
+		dataType: double
+		lineageTag: a88fbeb1-a3cc-4b74-962d-8b57a88c4b30
+		sourceLineageTag: avg_revenue_per_trip_usd
+		summarizeBy: sum
+		sourceColumn: avg_revenue_per_trip_usd
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column avg_fare_usd
+		dataType: double
+		lineageTag: 8d627113-4a14-4aab-a63d-a34c1a5c8874
+		sourceLineageTag: avg_fare_usd
+		summarizeBy: sum
+		sourceColumn: avg_fare_usd
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column avg_trip_distance
+		dataType: double
+		lineageTag: 1810061b-2589-4d91-8389-eb0e6d2db9a2
+		sourceLineageTag: avg_trip_distance
+		summarizeBy: sum
+		sourceColumn: avg_trip_distance
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column avg_trip_duration_min
+		dataType: double
+		lineageTag: a969562d-3237-416e-8a8b-d8a32ba752cc
+		sourceLineageTag: avg_trip_duration_min
+		summarizeBy: sum
+		sourceColumn: avg_trip_duration_min
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition FactTaxiDaily = entity
+		mode: directLake
+		source
+			entityName: FactTaxiDaily
+			schemaName: dbo
+			expressionSource: 'DirectLake - GoldWH'
+
