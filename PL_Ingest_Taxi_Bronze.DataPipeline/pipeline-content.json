@@ -5,9 +5,9 @@
         "type": "ForEach",
         "typeProperties": {
           "isSequential": false,
-          "batchCount": 4,
+          "batchCount": 2,
           "items": {
-            "value": "@pipeline().parameters.month_list",
+            "value": "@if(\n    equals(pipeline().parameters.mode, 'backfill'),\n    pipeline().parameters.month_list,\n    createArray(formatDateTime(addToTime(utcNow(), -2, 'Month'), 'yyyy-MM'))\n)",
             "type": "Expression"
           },
           "activities": [
@@ -87,6 +87,80 @@
           ]
         },
         "name": "ForEach_Taxi",
+        "dependsOn": [
+          {
+            "activity": "Copy_TaxiZones_Bronze",
+            "dependencyConditions": [
+              "Completed"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Copy",
+        "typeProperties": {
+          "source": {
+            "type": "BinarySource",
+            "formatSettings": {
+              "type": "BinaryReadSettings"
+            },
+            "storeSettings": {
+              "type": "HttpReadSettings",
+              "requestMethod": "GET"
+            },
+            "datasetSettings": {
+              "type": "Binary",
+              "typeProperties": {
+                "location": {
+                  "type": "HttpServerLocation"
+                }
+              },
+              "externalReferences": {
+                "connection": "c11698f7-a09f-4149-b494-0630a9638bd3"
+              },
+              "annotations": []
+            }
+          },
+          "sink": {
+            "type": "BinarySink",
+            "storeSettings": {
+              "type": "LakehouseWriteSettings",
+              "copyBehavior": "FlattenHierarchy"
+            },
+            "datasetSettings": {
+              "type": "Binary",
+              "typeProperties": {
+                "location": {
+                  "type": "LakehouseLocation",
+                  "folderPath": "bronze/taxi/zones",
+                  "fileName": "taxi_zones_4326.parquet"
+                }
+              },
+              "linkedService": {
+                "name": "LH_UrbanAnalytics",
+                "properties": {
+                  "type": "Lakehouse",
+                  "typeProperties": {
+                    "artifactId": "41248645-e9df-867d-4d3d-fa1d7bc6df61",
+                    "workspaceId": "00000000-0000-0000-0000-000000000000",
+                    "rootFolder": "Files"
+                  },
+                  "annotations": []
+                }
+              },
+              "annotations": []
+            }
+          },
+          "enableStaging": false
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Copy_TaxiZones_Bronze",
         "dependsOn": []
       }
     ],
@@ -146,6 +220,10 @@
           "2026-02",
           "2026-03"
         ]
+      },
+      "mode": {
+        "type": "string",
+        "defaultValue": "monthly"
       }
     }
   }

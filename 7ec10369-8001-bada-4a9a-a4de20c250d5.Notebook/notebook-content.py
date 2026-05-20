@@ -40,7 +40,7 @@ from collections import defaultdict
 
 # CELL ********************
 
-NYC_LOCATION_IDS = [384, 625, 626, 628, 631, 648, 664, 665, 857]
+NYC_LOCATION_IDS = [384, 625, 626, 628, 631, 648, 664, 665]
 POLLUTANTS = {'pm25', 'no2', 'o3', 'co', 'pm10'}
 S3_BASE = "https://openaq-data-archive.s3.amazonaws.com/records/csv.gz"
 
@@ -94,7 +94,7 @@ def fetch_location_day(lid, dt):
         if response.status_code == 404:
             return []
         if response.status_code != 200:
-            print(f"Status {response.status_code} for location {location_id} {dt}")
+            print(f"Status {response.status_code} for location {lid} {dt}")
             return []
 
         with gzip.open(io.BytesIO(response.content), 'rt') as f:
@@ -104,6 +104,8 @@ def fetch_location_day(lid, dt):
                     "location_id": int(row["location_id"]),
                     "sensor_id": int(row["sensors_id"]),
                     "location": row["location"],
+                    "lat": float(row["lat"]) if row["lat"] else None,
+                    "lon": float(row["lon"]) if row["lon"] else None,
                     "datetime": row["datetime"][:19],
                     "parameter": row["parameter"],
                     "units": row["units"],

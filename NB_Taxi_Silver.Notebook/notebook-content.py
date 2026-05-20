@@ -35,6 +35,51 @@ from functools import reduce
 
 # CELL ********************
 
+taxi_zones_path = "Files/bronze/taxi/zones/taxi_zones_4326.parquet"
+df_zones_raw = spark.read.parquet(taxi_zones_path)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+df_zones_silver = (df_zones_raw
+    .withColumn("zone_id", F.col("LocationID").cast("int"))
+    .withColumn("borough", F.col("borough").cast("string"))
+    .withColumn("zone_name", F.col("zone").cast("string"))
+    .dropna(subset=["zone_id"])
+    .dropDuplicates(["zone_id"])
+)
+
+df_zones_silver = df_zones_silver.select("zone_id", "zone_name", "borough")
+
+print("Taxi zone rows:", df_zones_silver.count())
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+df_zones_silver.write.format("delta").mode("overwrite") \
+    .option("overwriteSchema", "true").saveAsTable("silver_taxi_zones")
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
 target_columns = {
     "VendorID": "int",
     "tpep_pickup_datetime": "timestamp",

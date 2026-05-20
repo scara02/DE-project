@@ -22,27 +22,6 @@
 
 # CELL ********************
 
-spark.sql("""
-    SELECT * FROM bronze_openaq_hourly LIMIT 5
-""").show()
-
-spark.sql("""
-    SELECT parameter, COUNT(*) as rows, 
-           MIN(datetime) as earliest, 
-           MAX(datetime) as latest
-    FROM bronze_openaq_hourly
-    GROUP BY parameter
-""").show()
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
 from pyspark.sql import functions as F
 
 # METADATA ********************
@@ -83,6 +62,26 @@ print(f"Clean rows: {df_clean.count()}")
 
 # CELL ********************
 
+df_openaq_borough_map = spark.createDataFrame([
+    (648, "Brooklyn"),
+    (664, "Brooklyn"),
+    (626, "Bronx"),
+    (665, "Bronx"),
+    (384, "Manhattan"),
+    (625, "Manhattan"),
+    (628, "Queens"),
+    (631, "Queens")
+], ["location_id", "borough"])
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
 df_enriched = (df_clean
     .withColumn("datetime", F.to_timestamp("datetime"))
     .withColumn("date", F.to_date("datetime"))
@@ -90,7 +89,9 @@ df_enriched = (df_clean
     .withColumn("month", F.month("datetime"))
     .withColumn("hour", F.hour("datetime"))
     .withColumn("dow", F.dayofweek("datetime"))
-    )
+    .join(df_openaq_borough_map, "location_id", "left")
+    .filter(F.col("borough").isNotNull())
+)
 
 # METADATA ********************
 
