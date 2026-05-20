@@ -49,7 +49,7 @@ print(f"Total raw count: {total_raw}")
 df_clean = (df_raw
     .dropDuplicates(["sensor_id", "datetime", "parameter"])
     .dropna(subset=["datetime", "value"])
-    .filter(F.col("value") > 0))
+    .filter(F.col("value") >= 0))
 
 print(f"Clean rows: {df_clean.count()}")
 
@@ -83,6 +83,7 @@ df_openaq_borough_map = spark.createDataFrame([
 # CELL ********************
 
 df_enriched = (df_clean
+    .withColumnRenamed("parameter", "pollutant")
     .withColumn("datetime", F.to_timestamp("datetime"))
     .withColumn("date", F.to_date("datetime"))
     .withColumn("year", F.year("datetime"))
@@ -105,6 +106,22 @@ df_enriched = (df_clean
 df_enriched.write.format("delta").mode("overwrite") \
     .option("overwriteSchema", "true") \
     .partitionBy("year", "month").saveAsTable("silver_openaq_hourly")
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+df_locations = (df_enriched
+    .select("location_id", "borough")
+    .drop_duplicates(["location_id"]))
+
+df_locations.write.format("delta").mode("overwrite") \
+    .option("overwriteSchema", "true").saveAsTable("silver_openaq_locations")
 
 # METADATA ********************
 

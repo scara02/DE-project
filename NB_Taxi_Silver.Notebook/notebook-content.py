@@ -237,20 +237,3 @@ df_enriched.write.format("delta").mode("overwrite") \
 # META   "language": "python",
 # META   "language_group": "synapse_pyspark"
 # META }
-
-# CELL ********************
-
-spark.sql("""
-    SELECT pickup_year, pickup_month,
-           COUNT(*) as trips
-    FROM silver_nyc_taxi
-    GROUP BY 1, 2
-    ORDER BY 1, 2
-""").show(10)
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }

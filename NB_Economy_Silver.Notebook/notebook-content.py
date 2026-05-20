@@ -23,6 +23,7 @@
 # CELL ********************
 
 from pyspark.sql import functions as F
+from pyspark.sql.window import Window
 
 # METADATA ********************
 
@@ -53,7 +54,61 @@ df_ecb = (spark.sql("SELECT * FROM bronze_ecb")
         .withColumn("fx_date", F.to_date("fx_date"))
         .withColumn("usd_eur", F.col("usd_eur").cast("double")))
 
-df_ecb.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("silver_ecb")
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+date_start = "2022-01-01"
+last_fx_date = (df_ecb
+    .agg(F.max("fx_date").alias("last_fx_date"))
+    .collect()[0]["last_fx_date"]
+)
+
+df_calendar = spark.sql(f"""
+    SELECT explode(
+        sequence(to_date('{date_start}'), to_date('{last_fx_date}'), interval 1 day)
+    ) AS fx_date
+""")
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+df_daily = (df_calendar.join(df_ecb, "fx_date", "left"))
+
+window_spec = (Window
+    .orderBy("fx_date")
+    .rowsBetween(Window.unboundedPreceding, Window.currentRow)
+)
+
+df_filled = (df_daily
+    .withColumn(
+        "usd_eur",
+        F.last("usd_eur", ignorenulls=True).over(window_spec))
+    .dropna(subset=["usd_eur"])
+)
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+df_filled.write.format("delta").mode("overwrite") \
+    .option("overwriteSchema", "true").saveAsTable("silver_ecb")
 
 # METADATA ********************
 

@@ -65,8 +65,10 @@ except:
 
 if last_date is None:
     date_from = date(2022, 1, 1)
+    first_write = True
 else:
     date_from = datetime.strptime(str(last_date)[:10], "%Y-%m-%d").date() + timedelta(days=1)
+    first_write = False
 
 date_to = date.today().replace(day=1) - timedelta(days=1)
 
@@ -127,16 +129,11 @@ def fetch_location_day(lid, dt):
 
 # CELL ********************
 
-def write_batch_to_delta(rows, month_key):
+def write_batch_to_delta(rows, month_key, write_mode):
     if not rows:
         return 0
 
     df_batch = spark.createDataFrame([Row(**r) for r in rows])
-
-    if last_date:
-        write_mode = "append"
-    else:
-        write_mode = "overwrite"
 
     df_batch.write.format("delta").mode(write_mode) \
                 .option("mergeSchema", "true").saveAsTable(TABLE_NAME)
@@ -156,6 +153,8 @@ def write_batch_to_delta(rows, month_key):
 # CELL ********************
 
 if date_from:
+    write_mode = "overwrite" if first_write else "append"
+
     current = date_from
     total_days = (date_to - date_from).days + 1
     day_num = 0
@@ -168,7 +167,9 @@ if date_from:
         month_key = current.strftime("%Y-%m")
 
         if month_key != current_month and monthly_rows:
-            total_rows += write_batch_to_delta(monthly_rows, current_month)
+            total_rows += write_batch_to_delta(monthly_rows, current_month, write_mode)
+
+            write_mode = "append"
 
             monthly_rows = []
             current_month = month_key
@@ -178,7 +179,7 @@ if date_from:
 
         current += timedelta(days=1)
 
-    total_rows += write_batch_to_delta(monthly_rows, current_month)
+    total_rows += write_batch_to_delta(monthly_rows, current_month, write_mode)
 
     print(f"Total rows: {total_rows}")
 
