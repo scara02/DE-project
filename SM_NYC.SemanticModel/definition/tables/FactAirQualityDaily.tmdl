@@ -64,7 +64,24 @@ table FactAirQualityDaily
 			    [Weighted Avg Pollutant Value],
 			    FactAirQualityDaily[pollutant] = "pm25"
 			)
-		lineageTag: e848d97e-01c6-4e72-befa-b6bf6ca1d5c0
+		lineageTag: bf2cccea-8864-43d2-b27b-4c089df67b8e
+
+		changedProperty = Name
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Pollutant 7D MA' =
+			
+			AVERAGEX(
+			    DATESINPERIOD(
+			        DimDate[full_date],
+			        MAX(DimDate[full_date]),
+			        -7,
+			        DAY
+			    ),
+			    [Weighted Avg Pollutant Value]
+			)
+		lineageTag: e4b50991-1479-4333-b22f-445e44d9ab97
 
 		changedProperty = Name
 

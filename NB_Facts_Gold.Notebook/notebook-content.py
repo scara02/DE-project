@@ -54,7 +54,8 @@ taxi_with_boroughs = (taxi
     .join(zones.select(
         F.col("zone_id").alias("PULocationID"),
         F.col("borough")
-    ), "PULocationID", "inner"))
+    ), "PULocationID", "inner")
+    .join(openaq_boroughs, "borough", "inner"))
 
 # METADATA ********************
 
@@ -80,7 +81,6 @@ stg_fact_taxi_daily = (taxi_with_boroughs
         "date_key",
         "pickup_date",
         "borough",
-        "zone"
         "trip_count",
         "total_revenue_usd",
         "avg_revenue_per_trip_usd",
@@ -214,7 +214,6 @@ stg_fact_air_quality_daily = (air
         "date_key",
         "date",
         "borough",
-        "location_id"
         "pollutant",
         "avg_pollutant_value",
         "min_pollutant_value",

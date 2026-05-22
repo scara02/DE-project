@@ -2,6 +2,16 @@ table DimFX
 	lineageTag: 29d46047-e7b5-47b1-b9b0-8e0ace669b8a
 	sourceLineageTag: [dbo].[DimFX]
 
+	measure 'Total Revenue EUR' =
+			
+			SUMX(
+			    FactTaxiDaily,
+			    FactTaxiDaily[total_revenue_usd] * RELATED(DimFX[usd_eur])
+			)
+		lineageTag: 56c664c7-b1e3-49d2-a069-3a57c0de1909
+
+		changedProperty = Name
+
 	column date_key
 		dataType: int64
 		formatString: 0

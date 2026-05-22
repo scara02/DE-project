@@ -16,8 +16,8 @@ ref table FactAirQualityDaily
 ref table DimDate
 ref table DimGDP
 ref table DimZone
-ref table FactTaxiDaily
 ref table DimFX
 ref table FactTaxiZoneDaily
 ref table DimBorough
+ref table FactTaxiDaily
 

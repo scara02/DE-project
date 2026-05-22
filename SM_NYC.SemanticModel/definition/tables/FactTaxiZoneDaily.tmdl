@@ -2,6 +2,42 @@ table FactTaxiZoneDaily
 	lineageTag: d196a0d9-70c7-42a2-becc-41c64832e588
 	sourceLineageTag: [dbo].[FactTaxiZoneDaily]
 
+	measure 'Total Revenue USD' = SUM(FactTaxiDaily[total_revenue_usd])
+		lineageTag: 5834f428-bf29-4ba2-a5cd-28601c419c76
+
+		changedProperty = Name
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Avg Revenue per Trip USD' =
+			
+			DIVIDE(
+			    SUM(FactTaxiDaily[total_revenue_usd]),
+			    SUM(FactTaxiDaily[trip_count])
+			)
+		lineageTag: 578dd9df-b811-4e4e-988b-f6f8cd4551b6
+
+		changedProperty = Name
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Avg Fare USD' =
+			
+			AVERAGE(FactTaxiDaily[avg_fare_usd])
+		lineageTag: 01291976-0108-4d33-9ebf-54d426e06b9a
+
+		changedProperty = Name
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total Trips' =
+			
+			SUM(FactTaxiDaily[trip_count])
+		formatString: 0
+		lineageTag: 096c6ead-a890-42c2-8d35-032e34a0d33e
+
+		changedProperty = Name
+
 	column date_key
 		dataType: int64
 		formatString: 0

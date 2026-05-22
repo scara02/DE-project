@@ -46,10 +46,22 @@ print(f"Total raw count: {total_raw}")
 
 # CELL ********************
 
+quantiles = df_raw.approxQuantile("value", [0.9, 0.99], 0.01)
+quantiles
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
 df_clean = (df_raw
     .dropDuplicates(["sensor_id", "datetime", "parameter"])
     .dropna(subset=["datetime", "value"])
-    .filter(F.col("value") >= 0))
+    .filter(F.col("value").between(0, 100)))
 
 print(f"Clean rows: {df_clean.count()}")
 
@@ -122,22 +134,6 @@ df_locations = (df_enriched
 
 df_locations.write.format("delta").mode("overwrite") \
     .option("overwriteSchema", "true").saveAsTable("silver_openaq_locations")
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-display(
-    spark.read.table("silver_openaq_hourly")
-    .select("pollutant")
-    .distinct()
-    .orderBy("pollutant")
-)
 
 # METADATA ********************
 

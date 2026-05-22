@@ -1,16 +1,20 @@
-relationship 8e2a0feb-2e97-314b-667d-02d1d81d036a
-	fromColumn: FactTaxiDaily.date_key
-	toColumn: DimDate.date_key
-
 relationship e5b5ab1e-87f9-8e9c-a142-f2b4accd9a10
 	fromColumn: FactAirQualityDaily.date_key
 	toColumn: DimDate.date_key
 
-relationship 3cd445d7-6bd2-5cc6-e2f6-cc209c2c6e5e
-	fromColumn: FactTaxiDaily.borough
-	toColumn: DimZone.borough
-
 relationship f0ce5107-7d86-f7fb-ce04-9f6d2c86146d
 	fromColumn: FactTaxiZoneDaily.zone_id
 	toColumn: DimZone.zone_id
+
+relationship 0b461352-83d9-11bd-eb1e-e84e196a395b
+	fromColumn: FactAirQualityDaily.borough
+	toColumn: DimBorough.borough
+
+relationship 2bd4d62d-1f3d-30ed-7ed9-4affaacc18ad
+	fromColumn: FactTaxiDaily.date_key
+	toColumn: DimDate.date_key
+
+relationship 1cb5963a-2f32-6101-6c4b-99d337beb83b
+	fromColumn: FactTaxiDaily.borough
+	toColumn: DimBorough.borough
 
